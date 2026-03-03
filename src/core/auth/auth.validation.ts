@@ -68,7 +68,7 @@ export const signupSchema = z.object({
     firstName: z.string().min(1, 'First name is required').max(50, 'First name must be less than 50 characters'),
     lastName: z.string().min(1, 'Last name is required').max(50, 'Last name must be less than 50 characters'),
     phone: phoneSchema,
-});
+}).strict();;
 
 export type SignupInput = z.infer<typeof signupSchema>;
 
@@ -78,6 +78,6 @@ export type SignupInput = z.infer<typeof signupSchema>;
  */
 export const verifyEmailSchema = z.object({
   token: z.string().length(64, 'Invalid verification token'),
-});
+}).strict();;
 
 export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;

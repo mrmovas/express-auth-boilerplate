@@ -7,6 +7,7 @@ import { env } from '../../config/env.config';
 
 import { generateAndHashToken, hashToken } from '../../shared/utils/crypto.util';
 import { logger } from '../../shared/utils/logger.util';
+import { getCtx } from '../../shared/utils/requestContext.utils';
 
 
 
@@ -29,6 +30,7 @@ async function invalidateUserTokens(userID: string, type: TokensTable['tokenType
         // Only log if there was actually something to invalidate
         if(result && Number(result.numUpdatedRows) > 0) {
             logger.info('Previous tokens invalidated', {
+                ...getCtx(),
                 userId: userID,
                 tokenType: type,
                 count: Number(result.numUpdatedRows),
@@ -37,7 +39,7 @@ async function invalidateUserTokens(userID: string, type: TokensTable['tokenType
     }
 
     catch(error) {
-        logger.error('Error invalidating user tokens', { userId: userID, tokenType: type, error });
+        logger.error('Error invalidating user tokens', { userId: userID, tokenType: type, error, ...getCtx() });
         throw error;
     }
 }
@@ -82,6 +84,7 @@ export async function createTokenService(userID: string, type: TokensTable['toke
         userId: userID,
         tokenType: type,
         expiresAt: expiresAt.toISOString(),
+        ...getCtx(),
     });
 
     return { token, expiresAt };
@@ -103,7 +106,7 @@ export async function verifyTokenService(token: string, type: TokensTable['token
     
     // No token found
     if(!existingToken) {
-        logger.warn('Token verification failed: token not found', { tokenType: type });
+        logger.warn('Token verification failed: token not found', { tokenType: type, ...getCtx() });
         return null;
     }
 
@@ -121,6 +124,7 @@ export async function verifyTokenService(token: string, type: TokensTable['token
             logger.info('Verification link re-visited by already-verified user', {
                 userId: existingToken.userID,
                 tokenType: type,
+                ...getCtx(),
             });
             return existingToken.userID;
         }
@@ -129,6 +133,7 @@ export async function verifyTokenService(token: string, type: TokensTable['token
         logger.warn('Token reuse attempt detected', {
             userId: existingToken.userID,
             tokenType: type,
+            ...getCtx(),
         });
         return null; 
     }
@@ -138,6 +143,7 @@ export async function verifyTokenService(token: string, type: TokensTable['token
             userId: existingToken.userID,
             tokenType: type,
             expiredAt: existingToken.expiresAt.toISOString(),
+            ...getCtx(),
         });
         return null;
     }
@@ -152,6 +158,7 @@ export async function verifyTokenService(token: string, type: TokensTable['token
     logger.info('Token verified and consumed', {
         userId: existingToken.userID,
         tokenType: type,
+        ...getCtx(),
     });
 
     return existingToken.userID;

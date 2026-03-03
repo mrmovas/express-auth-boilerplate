@@ -3,6 +3,7 @@ import { getEmailTransporter } from '../../config/email.config';
 import { env } from '../../config/env.config';
 
 import { logger } from './logger.util';
+import { getCtx } from './requestContext.utils';
 
 
 
@@ -29,10 +30,10 @@ export async function sendEmail(to: string, template: EmailTemplate) {
             text: template.text,
         });
 
-        logger.info('Email sent', { subject: template.subject });
+        logger.info('Email sent', { subject: template.subject, ...getCtx() });
         return true;
     } catch (error) {
-        logger.error('Failed to send email', { subject: template.subject, error });
+        logger.error('Failed to send email', { subject: template.subject, error, ...getCtx() });
         return false;
     }
 }

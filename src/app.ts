@@ -46,11 +46,13 @@ app.use(cors({
  * - express.json(): Parses incoming requests with JSON payloads and is based on body-parser.
  * - express.urlencoded(): Parses incoming requests with URL-encoded payloads. Extended option allows for rich objects and arrays to be encoded into the URL-encoded format.
  * - compression: Compresses response bodies for all requests that traverse through the middleware, improving performance by reducing the size of the response body.
+ * - app.set('trust proxy', 1): This tells Express to trust the first proxy in front of it (like a load balancer), which allows req.ip to correctly identify the client's IP address instead of the proxy's IP. This is important for accurate logging and rate limiting based on client IP.
  */
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(compression());
+app.set('trust proxy', 1); // Trust first proxy, enables req.ip to resolve correctly
 
 
 

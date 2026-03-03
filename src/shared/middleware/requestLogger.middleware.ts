@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import { isProduction } from '../../config/env.config';
 
 import { logger, morganStream } from '../utils/logger.util';
+import { requestContext } from '../utils/requestContext.utils';
 
 
 
@@ -15,7 +16,10 @@ export const requestIdMiddleware = (req: Request, res: Response, next: NextFunct
     const requestId = uuidv4();
     res.locals.requestId = requestId;
     res.setHeader('X-Request-ID', requestId);
-    next();
+
+    // Everything that runs after next() in this request's async chain
+    // can now call getCtx() and get { requestId, ip, userId }
+    requestContext.run({ requestId, ip: req.ip ?? '', userId: null }, next);
 }
 
 
@@ -25,8 +29,8 @@ export const requestIdMiddleware = (req: Request, res: Response, next: NextFunct
 // Logs the raw HTTP line - method, url, status, duration, ip.
 export const requestLoggerMiddleware = morgan(
     isProduction
-        ? ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :response-time ms'
-        : '[development] :method :url :status :response-time ms - :res[content-length] :req[body]',
+        ? ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" :res[x-request-id] - :response-time ms'
+        : '[development] :method :url :status :response-time ms — ip::remote-addr — id::res[x-request-id]',
     {
         stream: morganStream,
         // Skip logging for specific routes (e.g., health checks)

@@ -5,6 +5,7 @@ import { hashPassword, comparePassword } from "../../shared/utils/crypto.util";
 import { sendVerificationEmail, /*sendPasswordResetEmail, sendWelcomeEmail*/ } from "../../shared/utils/email.util";
 import { createTokenService, verifyTokenService } from "../token/token.service";
 import { logger } from "../../shared/utils/logger.util";
+import { getCtx } from "../../shared/utils/requestContext.utils";
 
 import { SignupInput } from "./auth.validation";
 
@@ -52,6 +53,7 @@ export async function signupService(input: SignupInput): Promise<SignupResult> {
         if(!user) {
             logger.error('Signup failed: DB insert returned no row', {
                 email: input.email,
+                ...getCtx()
             });
             return { success: false, error: 'DATABASE_ERROR', message: 'Failed to create user. Please try again.' };
         }
@@ -64,10 +66,10 @@ export async function signupService(input: SignupInput): Promise<SignupResult> {
         if(!emailSent) {
             logger.warn('Verification email failed to send after signup', {
                 userId: user.id,
+                ...getCtx()
             });
         }
 
-        logger.info('User registered successfully', { userId: user.id });
         return { success: true, userId: user.id, email: user.email };
     });
 }
