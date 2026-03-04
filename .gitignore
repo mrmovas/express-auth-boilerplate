@@ -6,3 +6,5 @@ logs/*
 .env
 *.log
 package-lock.json
+
+README.md
