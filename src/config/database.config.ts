@@ -1,82 +1,55 @@
-import { Kysely, PostgresDialect, sql } from 'kysely';
-import { Pool } from 'pg';
-
-import { UsersTable, TokensTable } from '@/shared/types/database.types';
+import { PrismaClient } from '@prisma/client';
 import { logger } from '@/shared/utils/logger.util';
 import { getCtx } from '@/shared/utils/requestContext.utils';
 
 import { env } from '@/config/env.config';
 
-
-
-
-// CREATE PROSTGRESQL CONNECTION POOL
-const pool = new Pool({
-    // Connection Details
-    host: env.DB_HOST,
-    port: env.DB_PORT,
-    user: env.DB_USER,
-    password: env.DB_PASSWORD,
-    database: env.DB_NAME,
-
-    // Pool Management
-    min: env.DB_POOL_MIN,
-    max: env.DB_POOL_MAX,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 10000,
-});
-
-
-// HANDLE POOL ERRORS
-pool.on('error', (err) => {
-    logger.error('Unexpected database pool error', { error: err });
-});
-
-
-
-
-// CREATE KYSLEY INSTANCE
-export interface Database {
-    users: UsersTable;
-    tokens: TokensTable;
-}
-
-
 // Threshold in ms above which a query is considered slow and logged at warn
 const SLOW_QUERY_THRESHOLD_MS = 500;
 
-export const database = new Kysely<Database>({
-    dialect: new PostgresDialect({ pool }),
-    log(event) {
-        const ctx = getCtx();
-        if(event.level === 'query') {
-            const duration = event.queryDurationMillis;
 
-            // Log slow queries at warn level
-            if(duration > SLOW_QUERY_THRESHOLD_MS) logger.warn('Slow database query', {
-                ...ctx,
-                sql: event.query.sql,
-                duration: `${duration}ms`,
-                threshold: `${SLOW_QUERY_THRESHOLD_MS}ms`,
-            });
 
-            // Log all queries at debug level
-            else logger.debug('Database query', {
-                ...ctx,
-                sql: event.query.sql,
-                duration: event.queryDurationMillis,
-            });
-        }
 
-        else if(event.level === 'error') {
-            logger.error('Database error', {
-                ...ctx,
-                sql: event.query.sql,
-                error: event.error,
-            });
-        }                
-    },
-})
+// PRISMA CLIENT (singleton)
+// In development, hot-reload can create multiple instances — this pattern prevents that.
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
+
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({
+    log: [
+        { emit: 'event', level: 'query' },
+        { emit: 'event', level: 'error' },
+        { emit: 'event', level: 'warn'  },
+    ],
+});
+
+if (env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+
+
+
+
+// QUERY LOGGING
+// Replaces Kysely's log() callback — same behaviour, different API
+prisma.$on('query', (e) => {
+    const ctx = getCtx();
+    if(e.duration > SLOW_QUERY_THRESHOLD_MS) {
+        logger.warn('Slow database query', {
+            sql:       e.query,
+            duration:  `${e.duration}ms`,
+            threshold: `${SLOW_QUERY_THRESHOLD_MS}ms`,
+            ...ctx
+        });
+    } else {
+        logger.debug('Database query', {
+            sql:      e.query,
+            duration: `${e.duration}ms`,
+            ...ctx
+        });
+    }
+});
+
+prisma.$on('error', (e) => {
+    logger.error('Prisma client error', { message: e.message, ...getCtx() });
+});
 
 
 
@@ -84,7 +57,7 @@ export const database = new Kysely<Database>({
 // TEST CONNECTION
 export const testConnection = async (): Promise<boolean> => {
     try {
-        await sql`SELECT 1`.execute(database);
+        await prisma.$queryRaw`SELECT 1`;
         logger.info('Database connection established');
         return true;
     } catch (error) {
@@ -99,7 +72,7 @@ export const testConnection = async (): Promise<boolean> => {
 // GRACEFUL SHUTDOWN
 export const closeDatabase = async (): Promise<void> => {
     try {
-        await database.destroy();
+        await prisma.$disconnect();
         logger.info('Database connections closed');
     } catch (error) {
         logger.error('Error closing database connections', { error });

@@ -8,3 +8,4 @@ logs/*
 package-lock.json
 
 README.md
+/src/generated/prisma
