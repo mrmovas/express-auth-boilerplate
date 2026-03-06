@@ -32,35 +32,42 @@ export async function signupController(req: Request<{}, {}, SignupInput>, res: R
     try {
         const result = await signupService(req.body);
 
-        if(!result.success) {
-            if(result.error === 'EMAIL_ALREADY_EXISTS') {
-                logger.info('Signup rejected: email already registered', {
-                    email: result.email,    // Safe to log — it's already in our DB
-                    ...reqCtx(req)
-                });
-                sendConflict(res, result.message);
-                return;
-            }
-
-            // Unexpected failure - log at error with full context
-            logger.error('Signup failed unexpectedly', {
-                error: result.error,
-                ...reqCtx(req),
+        // FOR SUCCESS
+        if(result.success) {
+            logger.info('Signup successful', {
+              ...reqCtx(req),
             });
-            sendError(res, 'Registration failed. Please try again.');
+
+            sendSuccess(
+                res,
+                { userId: result.userId },
+                'Registration successful. Please check your email to verify your account.',
+                201
+            );
+            
             return;
         }
 
-        logger.info('Signup successful', {
+
+        // FOR NON SUCCESS
+        if(result.error === 'EMAIL_ALREADY_EXISTS') {
+            logger.info('Signup rejected: email already registered', {
+                email: result.email,    // Safe to log — it's already in our DB
+                ...reqCtx(req)
+            });
+            sendConflict(res, result.message);
+            return;
+        }
+
+        
+        // Unexpected failure - log at error with full context
+        logger.error('Signup failed unexpectedly', {
+            error: result.error,
             ...reqCtx(req),
         });
+        sendError(res, 'Registration failed. Please try again.');
+        return;
 
-        sendSuccess(
-            res,
-            { userId: result.userId },
-            'Registration successful. Please check your email to verify your account.',
-            201
-        );
     } catch(error) {
         logger.error('Signup failed with exception', {
             error: (error instanceof Error) ? error.message : String(error),

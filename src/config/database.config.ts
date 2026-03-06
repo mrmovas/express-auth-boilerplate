@@ -1,4 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../generated/prisma/client";
 import { logger } from '@/shared/utils/logger.util';
 import { getCtx } from '@/shared/utils/requestContext.utils';
 
@@ -12,17 +13,17 @@ const SLOW_QUERY_THRESHOLD_MS = 500;
 
 // PRISMA CLIENT (singleton)
 // In development, hot-reload can create multiple instances — this pattern prevents that.
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
-
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({
+const adapter = new PrismaPg({ connectionString: env.DB_URL });
+const prisma = new PrismaClient({ 
+    adapter,
     log: [
         { emit: 'event', level: 'query' },
         { emit: 'event', level: 'error' },
         { emit: 'event', level: 'warn'  },
-    ],
+    ]
 });
 
-if (env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+export { prisma };
 
 
 

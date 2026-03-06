@@ -11,7 +11,6 @@ CREATE TABLE "users" (
     "emailVerified" BOOLEAN NOT NULL DEFAULT false,
     "phone" JSONB NOT NULL,
     "role" TEXT NOT NULL DEFAULT 'UNASSIGNED',
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
     "lastLoginAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

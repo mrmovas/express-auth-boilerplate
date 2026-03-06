@@ -2,10 +2,10 @@ node_modules/
 dist/
 build/
 logs/*
+/src/generated/prisma
 
 .env
 *.log
 package-lock.json
 
 README.md
-/src/generated/prisma

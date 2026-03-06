@@ -23,7 +23,6 @@ model User {
   emailVerified  Boolean  @default(false)
   phone          Json     // { countryCode: string, number: string }
   role           String   @default("UNASSIGNED")
-  isActive       Boolean  @default(true)
   lastLoginAt    DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt      // Prisma auto-updates this on every update
@@ -45,7 +44,7 @@ model Token {
   usedAt       DateTime?
   createdAt    DateTime  @default(now())
 
-  user         User      @relation(fields: [userID], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userID], references: [id], onDelete: Cascade)
 
   @@map("tokens")
 }

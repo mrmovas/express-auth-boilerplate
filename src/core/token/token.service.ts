@@ -1,14 +1,13 @@
-import { Kysely, Transaction } from 'kysely';
-import { Database } from '@/config/database.config';
-
-import { database } from '@/config/database.config';
-import { TokensTable, TokenInsert } from '@/shared/types/database.types';
+import { prisma } from '@/config/database.config';
+import { PrismaClient, TokenType } from '@/generated/prisma/client';
 import { env } from '@/config/env.config';
 
 import { generateAndHashToken, hashToken } from '@/shared/utils/crypto.util';
 import { logger } from '@/shared/utils/logger.util';
 import { getCtx } from '@/shared/utils/requestContext.utils';
+import { DefaultArgs } from '@prisma/client/runtime/client';
 
+type PrismaTransactionClient = Omit<PrismaClient<never, undefined, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">
 
 
 
@@ -17,23 +16,27 @@ import { getCtx } from '@/shared/utils/requestContext.utils';
  */
 
 
-async function invalidateUserTokens(userID: string, type: TokensTable['tokenType'], db: Kysely<Database> | Transaction<Database> = database): Promise<void> {
+async function invalidateUserTokens(userID: string, type: TokenType, db: PrismaTransactionClient): Promise<void> {
     try {
-        const result = await db
-            .updateTable('tokens')
-            .set({ usedAt: new Date() })
-            .where('userID', '=', userID)
-            .where('tokenType', '=', type)
-            .where('usedAt', 'is', null)
-            .executeTakeFirst();
+        const result = await db.token.updateMany({
+            where: {
+                userID,
+                tokenType: type,
+                usedAt: { equals: null },
+            },
+            data: { usedAt: new Date() },
+        }).catch(error => {
+            logger.error('Error invalidating user tokens', { userId: userID, tokenType: type, error, ...getCtx() });
+            throw error;
+        });
         
         // Only log if there was actually something to invalidate
-        if(result && Number(result.numUpdatedRows) > 0) {
+        if(result.count > 0) {
             logger.info('Previous tokens invalidated', {
-                ...getCtx(),
                 userId: userID,
                 tokenType: type,
-                count: Number(result.numUpdatedRows),
+                count: Number(result.count),
+                ...getCtx(),
             });
         }
     }
@@ -53,7 +56,7 @@ async function invalidateUserTokens(userID: string, type: TokensTable['tokenType
 
 
 // CREATE TOKEN
-export async function createTokenService(userID: string, type: TokensTable['tokenType'], db: Kysely<Database> | Transaction<Database> = database): Promise<{ token: string; expiresAt: Date }> {
+export async function createTokenService(userID: string, type: TokenType, db: PrismaTransactionClient): Promise<{ token: string; expiresAt: Date }> {
     const { token, hash } = generateAndHashToken();
 
     // Calculate expiry based on token type
@@ -68,17 +71,14 @@ export async function createTokenService(userID: string, type: TokensTable['toke
     await invalidateUserTokens(userID, type, db);
 
     // Insert new token into database
-    const tokenData: TokenInsert = {
-        userID,
-        tokenHashed: hash,
-        tokenType: type,
-        expiresAt,
-    };
-
-    await db
-        .insertInto('tokens')
-        .values(tokenData)
-        .execute();
+    await db.token.create({
+        data: {
+            userID,
+            tokenHashed: hash,
+            tokenType: type,
+            expiresAt,
+        }
+    });
 
     logger.info('Token created', {
         userId: userID,
@@ -94,15 +94,20 @@ export async function createTokenService(userID: string, type: TokensTable['toke
 
 
 // VERIFY TOKEN
-export async function verifyTokenService(token: string, type: TokensTable['tokenType'], db: Kysely<Database> | Transaction<Database> = database): Promise<string | null> {
+export async function verifyTokenService(token: string, type: TokenType, db: PrismaTransactionClient): Promise<string | null> {
     const hash = hashToken(token);
 
-    const existingToken = await db
-        .selectFrom('tokens')
-        .select(['userID', 'expiresAt', 'usedAt'])
-        .where('tokenHashed', '=', hash)
-        .where('tokenType', '=', type)
-        .executeTakeFirst();
+    const existingToken = await db.token.findFirst({
+        where: {
+            tokenHashed: hash,
+            tokenType: type
+        },
+        select: {
+            userID: true,
+            expiresAt: true,
+            usedAt: true
+        }
+    });
     
     // No token found
     if(!existingToken) {
@@ -112,11 +117,10 @@ export async function verifyTokenService(token: string, type: TokensTable['token
 
     // If the token was already used, check if the user is already verified.
     if(existingToken.usedAt) {
-        const user = await db
-            .selectFrom('users')
-            .select('emailVerified')
-            .where('id', '=', existingToken.userID)
-            .executeTakeFirst();
+        const user = await db.user.findUnique({
+            where: { id: existingToken.userID },
+            select: { emailVerified: true }
+        });
         
         // If they are already verified, just return the ID. 
         // The Controller can then say "Welcome back!" instead of "Error!"
@@ -149,11 +153,14 @@ export async function verifyTokenService(token: string, type: TokensTable['token
     }
 
     // First time use - mark as used
-    await db
-        .updateTable('tokens')
-        .set({ usedAt: new Date() })
-        .where('tokenHashed', '=', hash)
-        .execute();
+    await db.token.updateMany({
+        where: {
+            tokenHashed: hash,
+            tokenType: type,
+            usedAt: null,
+        },
+        data: { usedAt: new Date() },
+    });
     
     logger.info('Token verified and consumed', {
         userId: existingToken.userID,

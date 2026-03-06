@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/index.ts"
   },
   "keywords": [],
   "author": "mrmovas",
   "license": "ISC",
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
     "@prisma/adapter-pg": "^7.4.2",
     "@prisma/client": "^7.4.2",
@@ -24,7 +24,6 @@
     "express-session": "^1.19.0",
     "helmet": "^8.1.0",
     "http": "^0.0.1-security",
-    "kysely": "^0.28.11",
     "libphonenumber-js": "^1.12.38",
     "morgan": "^1.10.1",
     "nodemailer": "^8.0.1",
@@ -47,6 +46,7 @@
     "@types/pg": "^8.18.0",
     "prisma": "^7.4.2",
     "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }

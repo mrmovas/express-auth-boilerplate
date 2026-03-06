@@ -18,6 +18,7 @@ const envSchema = z.object({
     DB_NAME: z.string().nonempty('[ENV] Database name is required'),
     DB_POOL_MIN: z.string().default('2').transform(Number).pipe(z.number().min(0)),
     DB_POOL_MAX: z.string().default('10').transform(Number).pipe(z.number().min(1)),
+    DB_URL: z.string().optional(),
 
     // SESSION
     SESSION_SECRET: z.string().min(32, '[ENV] Session secret must be at least 32 characters'),
