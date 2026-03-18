@@ -1,5 +1,4 @@
 import { betterAuth } from "better-auth";
-import { createAuthClient } from "better-auth/client"
 import { prismaAdapter } from "better-auth/adapters/prisma";
 
 import { env } from "@/config/env.config";

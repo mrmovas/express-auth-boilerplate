@@ -79,7 +79,7 @@ export function reqCtx(req: Request) {
         method: req.method,
         path: req.path,
         userAgent: req.get('user-agent'),
-        userId: req.session?.user?.id ?? null,          // Null if unauthenticated
+        userId: req.res?.locals?.session?.user?.id ?? null,  // Null if unauthenticated
     };
 }
 

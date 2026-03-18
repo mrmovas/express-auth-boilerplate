@@ -16,7 +16,7 @@ export const generalRateLimiterMiddleware = rateLimit({
     message: 'Too many requests, please try again later.',
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-    handler: (req: Request, res: Response) => {
+    handler: (_req: Request, res: Response) => {
         sendTooManyRequests(res, "Too many requests, please try again later.");
     }
 })
@@ -35,7 +35,7 @@ export const authRateLimiterMiddleware = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     skipSuccessfulRequests: true, // Don't count successful requests
-    handler: (req: Request, res: Response) => {
+    handler: (_req: Request, res: Response) => {
         sendTooManyRequests(res, 'Too many authentication attempts. Please try again in 15 minutes.');
     },
 });
@@ -53,7 +53,7 @@ export const passwordResetRateLimiterMiddleware = rateLimit({
     message: 'Too many password reset requests, please try again later',
     standardHeaders: true,
     legacyHeaders: false,
-    handler: (req: Request, res: Response) => {
+    handler: (_req: Request, res: Response) => {
         sendTooManyRequests(res, 'Too many password reset requests. Please try again in 1 hour.');
     },
 });
@@ -70,7 +70,7 @@ export const emailVerificationRateLimiterMiddleware = rateLimit({
     message: 'Too many verification email requests, please try again later',
     standardHeaders: true,
     legacyHeaders: false,
-    handler: (req: Request, res: Response) => {
+    handler: (_req: Request, res: Response) => {
         sendTooManyRequests(res, 'Too many verification email requests. Please try again in 1 hour.');
     },
 });

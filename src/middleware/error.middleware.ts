@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
 // Global Error Handler
-export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction): void => {
+export const errorHandler = (err: Error, _req: Request, res: Response, _next: NextFunction): void => {
     const status = (err as any).status ?? (err as any).statusCode ?? 500;
 
     res.status(status).json({

@@ -17,7 +17,7 @@
 // });
 
 
-type roles = "UNASSIGNED" | "USER" | "ADMIN";
+// type roles = "UNASSIGNED" | "USER" | "ADMIN";
 
 
 // export interface UserCustomFields {

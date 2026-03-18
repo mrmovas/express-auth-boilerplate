@@ -1,18 +1,11 @@
 import { Request, Response } from 'express';
 
-import { auth } from '@/utils/auth';
-
 import { MainPage } from '@/types/pages.types';
-import { User } from '@/types/user.types';
 
 
 
 
-
-
-
-
-export async function mainController(req: Request, res: Response) {
+export async function mainController(_req: Request, res: Response) {
     const mainPage: MainPage = {
         header: {
             title: 'Auth Boilerplate',

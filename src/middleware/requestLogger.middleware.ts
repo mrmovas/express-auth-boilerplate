@@ -63,7 +63,7 @@ export const detailedRequestLogger = (req: Request, res: Response, next: NextFun
         const duration = Date.now() - startTime;
         const level = res.statusCode >= 500 ? 'error' : res.statusCode >= 400 ? 'warn' : 'info';
 
-        logger.info('Request completed', {
+        logger[level]('Request completed', {
             requestId: res.locals.requestId,
             ip: req.ip,
             method: req.method,
