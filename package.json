@@ -1,7 +1,7 @@
 {
-  "name": "express-auth-boilerplate",
-  "version": "1.0.0",
-  "description": "Production-ready Express authentication boilerplate with TypeScript, Prisma, and session-based auth",
+  "name": "express-betterauth-boilerplate",
+  "version": "1.0.0-alpha",
+  "description": "Production-ready Express & TypeScript boilerplate featuring Better-Auth, Prisma ORM, and PostgreSQL with a clean, type-safe architecture.",
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/index.ts",
