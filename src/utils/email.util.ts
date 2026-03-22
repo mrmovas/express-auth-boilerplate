@@ -51,7 +51,7 @@ Thank you for signing up. To complete your registration, please verify your emai
 
 ${verificationUrl}
 
-This link will expire in ${env.VERIFICATION_TOKEN_EXPIRY_HOURS} hours.
+This link will expire in ${env.VERIFICATION_TOKEN_EXPIRE_IN / 3600} hours.
 
 If you didn't create an account, you can safely ignore this email.`
 
@@ -72,7 +72,7 @@ We received a request to reset your password. Visit the following link to create
 ${resetUrl}
 
 ⚠️ SECURITY NOTICE:
-This link will expire in ${env.PASSWORD_RESET_TOKEN_EXPIRY_HOURS} hour(s) for your security.
+This link will expire in ${env.PASSWORD_RESET_TOKEN_EXPIRE_IN / 3600} hour(s) for your security.
 
 If you didn't request a password reset, please ignore this email or contact support if you have concerns.
 

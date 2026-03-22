@@ -18,6 +18,11 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  firstName     String    @default("")
+  lastName      String    @default("")
+  country       String    @default("")
+  phoneNumber   String    @default("")
+  role          String    @default("user")
 
   @@unique([email])
   @@map("user")

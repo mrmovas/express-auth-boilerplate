@@ -72,14 +72,9 @@ app.set('trust proxy', 1); // Trust first proxy, enables req.ip to resolve corre
 
 
 /**
- * VIEW ENGINE SETUP
- * - view engine: Sets EJS as the templating engine for rendering views.
- * - views: Specifies the directory where the view templates are located.
- * - layout: Sets the default layout file for EJS templates.
- * - express-ejs-layouts: Middleware to support layout files in EJS, allowing for consistent structure across different views.
+ * STATIC FILE SERVING
+ * - express.static: Serves static files from the specified directory. In this case, it serves files from the 'public' directory, which can include CSS, JS, images, etc.
  */
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, './views'));
 app.use(express.static(path.join(__dirname, '../public')));
 
 

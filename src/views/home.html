@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <script src="main.js" defer></script>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body class="bg-bg text-[#f0f0f0] min-h-screen flex flex-col text-sm leading-relaxed">
+
+    <!-- NAVBAR -->
+    <nav x-data x-init="$store.auth.init()" class="flex justify-between items-center px-10 py-5 border-b border-border">
+        <a href="/" class="font-serif text-xl text-[#f0f0f0] no-underline">auth.</a>
+        <div class="flex items-center gap-5">
+            <template x-if="$store.auth.user">
+                <div class="flex items-center gap-5">
+                    <a href="/profile" class="text-accent no-underline hover:underline"
+                       x-text="$store.auth.user.firstName"></a>
+                    <button @click="$store.auth.logout('/')"
+                            class="cursor-pointer font-mono text-sm bg-transparent text-[#f0f0f0] border border-border rounded px-3.5 py-1.5 hover:border-[#f0f0f0] transition-colors">
+                        Logout
+                    </button>
+                </div>
+            </template>
+            <template x-if="!$store.auth.user">
+                <div class="flex items-center gap-5">
+                    <a href="/auth" class="text-accent no-underline hover:underline">Login</a>
+                    <a href="/auth?activeTab=register"
+                       class="cursor-pointer font-mono text-sm bg-transparent text-[#f0f0f0] border border-border rounded px-3.5 py-1.5 hover:border-[#f0f0f0] transition-colors no-underline">
+                        Register
+                    </a>
+                </div>
+            </template>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="flex-1 flex justify-center items-center px-5 py-16">
+        <div x-data class="max-w-[680px]">
+
+            <!-- Badge -->
+            <div class="inline-block text-[11px] tracking-widest uppercase text-accent border border-accent px-2.5 py-1 rounded-full mb-8">
+                auth boilerplate
+            </div>
+
+            <!-- Headline -->
+            <h1 class="font-serif leading-[1.05] mb-5" style="font-size: clamp(48px, 8vw, 80px)">
+                Your app<br>
+                <em class="italic text-accent">starts here.</em>
+            </h1>
+
+            <!-- Sub -->
+            <p class="text-muted text-[15px] max-w-[480px] mb-10 leading-7">
+                A minimal Express + Alpine SPA auth setup.
+                Register, verify your email, and access your profile.
+            </p>
+
+            <!-- Actions -->
+            <div class="flex gap-3 flex-wrap mb-14 items-center">
+                <template x-if="$store.auth.user">
+                    <div class="flex gap-3 flex-wrap items-center">
+                        <p class="text-muted">
+                            Welcome back,
+                            <strong class="text-[#f0f0f0]" x-text="$store.auth.user.firstName"></strong>
+                        </p>
+                        <a href="/profile"
+                           class="cursor-pointer font-mono text-sm bg-accent text-bg font-medium rounded px-5 py-2.5 hover:opacity-85 transition-opacity no-underline">
+                            Go to profile →
+                        </a>
+                        <button @click="$store.auth.logout('/')"
+                                class="cursor-pointer font-mono text-sm bg-transparent text-[#f0f0f0] border border-border rounded px-5 py-2.5 hover:border-[#f0f0f0] transition-colors">
+                            Logout
+                        </button>
+                    </div>
+                </template>
+                <template x-if="!$store.auth.user">
+                    <div class="flex gap-3 flex-wrap items-center">
+                        <a href="/auth?activeTab=register"
+                           class="cursor-pointer font-mono text-sm bg-accent text-bg font-medium rounded px-5 py-2.5 hover:opacity-85 transition-opacity no-underline">
+                            Get started →
+                        </a>
+                        <a href="/auth?activeTab=login"
+                           class="cursor-pointer font-mono text-sm bg-transparent text-[#f0f0f0] border border-border rounded px-5 py-2.5 hover:border-[#f0f0f0] transition-colors no-underline">
+                            Login
+                        </a>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Stack -->
+            <div class="text-muted text-xs">
+                <span>Express</span> · <span>Better-Auth</span> · <span>PostgreSQL</span> · <span>Prisma</span> · <span>Alpine.js</span> · <span>Tailwind</span>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-5 text-muted text-xs border-t border-border">
+        &copy; <span x-data x-text="new Date().getFullYear()"></span> — Your App
+    </footer>
+
+</body>
+</html>

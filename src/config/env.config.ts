@@ -42,8 +42,8 @@ const envSchema = z.object({
     FRONTEND_URL: z.url().default('http://localhost:3000'),
 
     // TOKENS
-    VERIFICATION_TOKEN_EXPIRY_HOURS: z.string().default('24').transform(Number).pipe(z.number().positive()),
-    PASSWORD_RESET_TOKEN_EXPIRY_HOURS: z.string().default('1').transform(Number).pipe(z.number().positive()),
+    VERIFICATION_TOKEN_EXPIRE_IN: z.string().default('24').transform(Number).pipe(z.number().positive()),
+    PASSWORD_RESET_TOKEN_EXPIRE_IN: z.string().default('1').transform(Number).pipe(z.number().positive()),
 });
 
 

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <script src="main.js" defer></script>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body class="bg-bg text-[#f0f0f0] min-h-screen flex flex-col text-sm leading-relaxed">
+
+    <!-- NAVBAR -->
+    <nav x-data x-init="$store.auth.init()" class="flex justify-between items-center px-10 py-5 border-b border-border">
+        <a href="/" class="font-serif text-xl text-[#f0f0f0] no-underline">auth.</a>
+        <div class="flex items-center gap-5">
+            <template x-if="$store.auth.user">
+                <div class="flex items-center gap-5">
+                    <a href="/profile" class="text-accent no-underline hover:underline"
+                       x-text="$store.auth.user.firstName"></a>
+                    <button @click="$store.auth.logout('/')"
+                            class="cursor-pointer font-mono text-sm bg-transparent text-[#f0f0f0] border border-border rounded px-3.5 py-1.5 hover:border-[#f0f0f0] transition-colors">
+                        Logout
+                    </button>
+                </div>
+            </template>
+            <template x-if="!$store.auth.user">
+                <div class="flex items-center gap-5">
+                    <a href="/auth" class="text-accent no-underline hover:underline">Login</a>
+                    <a href="/auth?activeTab=register"
+                       class="cursor-pointer font-mono text-sm bg-transparent text-[#f0f0f0] border border-border rounded px-3.5 py-1.5 hover:border-[#f0f0f0] transition-colors no-underline">
+                        Register
+                    </a>
+                </div>
+            </template>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="flex-1 flex justify-center px-5 py-16">
+        <div x-data="profilePage" class="flex flex-col gap-6 w-full max-w-[480px]">
+
+            <!-- ── PROFILE CARD ── -->
+            <div class="bg-surface border border-border rounded-xl p-10">
+
+                <!-- Header -->
+                <div class="flex items-center gap-5 mb-7">
+                    <div class="w-14 h-14 bg-accent text-bg rounded-full flex items-center justify-center font-serif text-xl flex-shrink-0"
+                         x-text="initials()"></div>
+                    <div>
+                        <h1 class="font-serif text-[26px] mb-1.5" x-text="fullName()"></h1>
+                        <span class="text-[11px] tracking-widest uppercase text-muted border border-border px-2 py-0.5 rounded-full"
+                              x-text="$store.auth.user?.role || ''"></span>
+                    </div>
+                </div>
+
+                <div class="h-px bg-border my-6"></div>
+
+                <!-- Alerts -->
+                <div x-show="profileError" x-cloak class="mb-4 px-3.5 py-2.5 rounded text-[13px] bg-[#2a1010] text-danger border border-danger"
+                     x-text="profileError"></div>
+                <div x-show="profileSuccess" x-cloak class="mb-4 px-3.5 py-2.5 rounded text-[13px] bg-[#102a1a] text-ok border border-ok"
+                     x-text="profileSuccess"></div>
+
+                <!-- Info grid -->
+                <dl class="grid gap-y-3 gap-x-4" style="grid-template-columns: 140px 1fr">
+                    <dt class="text-muted text-[12px] uppercase tracking-wider pt-0.5">Email</dt>
+                    <dd x-text="$store.auth.user?.email || ''"></dd>
+
+                    <dt class="text-muted text-[12px] uppercase tracking-wider pt-0.5">Email verified</dt>
+                    <dd>
+                        <template x-if="$store.auth.user?.emailVerified">
+                            <span class="text-ok">✓ Verified</span>
+                        </template>
+                        <template x-if="$store.auth.user && !$store.auth.user.emailVerified">
+                            <span>
+                                <span class="text-danger">✗ Not verified</span>
+                                &nbsp;·&nbsp;
+                                <a href="/auth?activeTab=resend" class="text-accent hover:underline">Resend link</a>
+                            </span>
+                        </template>
+                    </dd>
+
+                    <dt class="text-muted text-[12px] uppercase tracking-wider pt-0.5">User ID</dt>
+                    <dd class="text-[12px] break-all" x-text="$store.auth.user?.id || ''"></dd>
+
+                    <dt class="text-muted text-[12px] uppercase tracking-wider pt-0.5">Member since</dt>
+                    <dd x-text="memberSince()"></dd>
+                </dl>
+
+                <div class="h-px bg-border my-6"></div>
+
+                <button @click="$store.auth.logout('/')"
+                        class="w-full cursor-pointer font-mono text-sm bg-transparent text-muted border border-border rounded py-2.5 hover:border-danger hover:text-danger transition-colors">
+                    Sign out
+                </button>
+            </div>
+
+
+            <!-- ── CHANGE PASSWORD CARD ── -->
+            <div class="bg-surface border border-border rounded-xl p-10">
+                <h2 class="font-serif text-[22px] mb-5">Change password</h2>
+
+                <!-- Alert -->
+                <div x-show="$store.auth.errorMessage" x-cloak class="mb-4 px-3.5 py-2.5 rounded text-[13px] bg-[#2a1010] text-danger border border-danger"
+                     x-text="$store.auth.errorMessage"></div>
+
+                <form @submit.prevent="changePassword" class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label for="currentPassword" class="text-[11px] text-muted uppercase tracking-wider">Current password</label>
+                        <input id="currentPassword" type="password" x-model="currentPassword"
+                               placeholder="••••••••" required autocomplete="current-password"
+                               class="w-full bg-bg border border-border rounded text-[#f0f0f0] font-mono text-sm px-3.5 py-2.5 outline-none focus:border-accent transition-colors">
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label for="newPassword" class="text-[11px] text-muted uppercase tracking-wider">New password</label>
+                        <input id="newPassword" type="password" x-model="newPassword"
+                               placeholder="••••••••" required autocomplete="new-password"
+                               class="w-full bg-bg border border-border rounded text-[#f0f0f0] font-mono text-sm px-3.5 py-2.5 outline-none focus:border-accent transition-colors">
+                        <div x-show="newPassword && !isValidPassword()" x-cloak class="text-danger text-[13px] mt-1">
+                                <div x-html="passwordRequirements().replace(/\n/g, '<br>')"></div>
+                            </div>    
+                    </div>
+
+                    <button type="submit"
+                            class="w-full cursor-pointer font-mono text-sm bg-accent text-bg font-medium rounded px-5 py-3 hover:opacity-85 transition-opacity">
+                        Change password →
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-5 text-muted text-xs border-t border-border">
+        &copy; <span x-data x-text="new Date().getFullYear()"></span> — Your App
+    </footer>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('profilePage', () => ({
+                profileError: null,
+                profileSuccess: null,
+                currentPassword: '',
+                newPassword: '',
+
+                initials() {
+                    const u = this.$store.auth.user
+                    if (!u) return ''
+                    return (u.firstName?.[0] || '').toUpperCase() + (u.lastName?.[0] || '').toUpperCase()
+                },
+
+                fullName() {
+                    const u = this.$store.auth.user
+                    if (!u) return ''
+                    return `${u.firstName} ${u.lastName}`
+                },
+
+                memberSince() {
+                    const u = this.$store.auth.user
+                    if (!u?.createdAt) return ''
+                    return new Date(u.createdAt).toLocaleDateString('en-GB', {
+                        day: 'numeric', month: 'long', year: 'numeric'
+                    })
+                },
+
+                isValidPassword() {
+                    return this.newPassword.length >= 8
+                        && /[A-Z]/.test(this.newPassword)
+                        && /[a-z]/.test(this.newPassword)
+                        && /[0-9]/.test(this.newPassword)
+                        && /[^A-Za-z0-9]/.test(this.newPassword)
+                },
+
+                passwordRequirements() {
+                    let msg = 'Password needs at least:'
+                    if (this.newPassword.length < 8)         msg += '\n- 8 characters'
+                    if (!/[A-Z]/.test(this.newPassword))     msg += '\n- 1 uppercase letter'
+                    if (!/[a-z]/.test(this.newPassword))     msg += '\n- 1 lowercase letter'
+                    if (!/[0-9]/.test(this.newPassword))     msg += '\n- 1 number'
+                    if (!/[^A-Za-z0-9]/.test(this.newPassword)) msg += '\n- 1 symbol'
+                    return msg
+                },
+
+                changePassword() {
+                    this.$store.auth.changePassword(this.currentPassword, this.newPassword)
+                }
+            }))
+        })
+    </script>
+
+</body>
+</html>

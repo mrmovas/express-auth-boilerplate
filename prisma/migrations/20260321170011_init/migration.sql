@@ -1,22 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `tokens` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `users` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropForeignKey
-ALTER TABLE "tokens" DROP CONSTRAINT "tokens_userID_fkey";
-
--- DropTable
-DROP TABLE "tokens";
-
--- DropTable
-DROP TABLE "users";
-
--- DropEnum
-DROP TYPE "TokenType";
-
 -- CreateTable
 CREATE TABLE "user" (
     "id" TEXT NOT NULL,
@@ -26,6 +7,11 @@ CREATE TABLE "user" (
     "image" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "firstName" TEXT NOT NULL DEFAULT '',
+    "lastName" TEXT NOT NULL DEFAULT '',
+    "country" TEXT NOT NULL DEFAULT '',
+    "phoneNumber" TEXT NOT NULL DEFAULT '',
+    "role" TEXT NOT NULL DEFAULT 'user',
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
