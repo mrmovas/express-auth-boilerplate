@@ -1,6 +1,5 @@
-import { Response } from 'express';
-import path from 'path';
-
+import { Response } from "express";
+import path from "path";
 
 /**
  * This function is used to send HTML files using res.sendFile.
@@ -8,6 +7,6 @@ import path from 'path';
  */
 
 export function sendHtml(res: Response, filename: string) {
-    if(!filename.endsWith('.html')) filename += '.html';
-    res.sendFile(filename, { root: path.join(__dirname, '../../views') });
+	if (!filename.endsWith(".html")) filename += ".html";
+	res.sendFile(filename, { root: path.join(__dirname, "../../views") });
 }

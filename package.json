@@ -12,7 +12,9 @@
         "db:generate": "npx prisma generate",
         "db:studio": "npx prisma studio",
         "tailwind:build": "@tailwindcss -i ./public/input.css -o ./public/styles.css --minify",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "format": "biome format ./src --write",
+        "format:check": "remark ./src --quiet --frail"
     },
     "keywords": [],
     "author": "mrmovas",
@@ -46,6 +48,7 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
+        "@biomejs/biome": "2.4.9",
         "@types/bcrypt": "^6.0.0",
         "@types/compression": "^1.8.1",
         "@types/connect-pg-simple": "^7.0.3",

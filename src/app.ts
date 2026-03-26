@@ -1,29 +1,24 @@
-import express, { Application } from 'express';
-import helmet from 'helmet';
-import cors from 'cors';
-import compression from 'compression';
+import express, { Application } from "express";
+import helmet from "helmet";
+import cors from "cors";
+import compression from "compression";
 import { toNodeHandler } from "better-auth/node";
-import { auth } from '@/utils/auth';
-import path from 'path';
+import { auth } from "@/utils/auth";
+import path from "path";
 
-import { env, isProduction } from '@/config/env.config';
+import { env, isProduction } from "@/config/env.config";
 
 //MIDDLEWARE
-import { requestIdMiddleware, requestLoggerMiddleware } from '@/middleware/requestLogger.middleware';
-import { generalRateLimiterMiddleware } from '@/middleware/ratelimit.middleware';
-import { notFoundHandler } from '@/middleware/notFound.middleware';
-import { errorHandler } from '@/middleware/error.middleware';
-import { sessionMiddleware } from './middleware/session.middleware';
+import { requestIdMiddleware, requestLoggerMiddleware } from "@/middleware/requestLogger.middleware";
+import { generalRateLimiterMiddleware } from "@/middleware/ratelimit.middleware";
+import { notFoundHandler } from "@/middleware/notFound.middleware";
+import { errorHandler } from "@/middleware/error.middleware";
+import { sessionMiddleware } from "./middleware/session.middleware";
 
 //ROUTES
-import routes from '@/routes/index.routes';
-
-
+import routes from "@/routes/index.routes";
 
 const app: Application = express();
-
-
-
 
 /**
  * SECURITY MIDDLEWARE
@@ -31,44 +26,42 @@ const app: Application = express();
  * - cors: Enables Cross-Origin Resource Sharing, allowing the server to specify who can access its resources.
  */
 
-app.use(helmet({
-    contentSecurityPolicy: isProduction ? {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: [
-                "'self'",
-                "'unsafe-inline'",
-                "'unsafe-eval'",
-                "https://cdn.jsdelivr.net",
-            ],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-            fontSrc: ["'self'", "https://fonts.gstatic.com"],
-            connectSrc: ["'self'"],
-            formAction: ["'self'"],
-            baseUri: ["'none'"],
-            //imgSrc: ["'self'", "data:", "https://images.example.com"],
-            upgradeInsecureRequests: [], // Automatically upgrade HTTP requests to HTTPS
-        },
-        //reportOnly: true, // Set to true to only report violations without enforcing the policy
-    } : false, // Disable CSP in development for easier debugging
-    crossOriginResourcePolicy: { policy: 'cross-origin' }, // Allows resources to be loaded from different origins, necessary for serving static files and APIs
-    crossOriginOpenerPolicy: { policy: 'same-origin' }, // Isolates the browsing context to prevent cross-origin attacks
-    frameguard: { action: 'deny' }, // Prevents the app from being embedded in iframes, protecting against clickjacking
-    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true }, // Enforces HTTPS for all connections to the server
-    hidePoweredBy: true, // Hides the X-Powered-By header to make it less obvious that the app is running on Express
-    referrerPolicy: { policy: 'strict-origin-when-cross-origin' }, // Controls the Referer header to prevent leaking sensitive information in cross-origin requests
-    noSniff: true, // Prevents browsers from MIME-sniffing a response away from the declared content-type
-}));
+app.use(
+	helmet({
+		contentSecurityPolicy: isProduction
+			? {
+					directives: {
+						defaultSrc: ["'self'"],
+						scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net"],
+						styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+						fontSrc: ["'self'", "https://fonts.gstatic.com"],
+						connectSrc: ["'self'"],
+						formAction: ["'self'"],
+						baseUri: ["'none'"],
+						//imgSrc: ["'self'", "data:", "https://images.example.com"],
+						upgradeInsecureRequests: [], // Automatically upgrade HTTP requests to HTTPS
+					},
+					//reportOnly: true, // Set to true to only report violations without enforcing the policy
+				}
+			: false, // Disable CSP in development for easier debugging
+		crossOriginResourcePolicy: { policy: "cross-origin" }, // Allows resources to be loaded from different origins, necessary for serving static files and APIs
+		crossOriginOpenerPolicy: { policy: "same-origin" }, // Isolates the browsing context to prevent cross-origin attacks
+		frameguard: { action: "deny" }, // Prevents the app from being embedded in iframes, protecting against clickjacking
+		hsts: { maxAge: 31536000, includeSubDomains: true, preload: true }, // Enforces HTTPS for all connections to the server
+		hidePoweredBy: true, // Hides the X-Powered-By header to make it less obvious that the app is running on Express
+		referrerPolicy: { policy: "strict-origin-when-cross-origin" }, // Controls the Referer header to prevent leaking sensitive information in cross-origin requests
+		noSniff: true, // Prevents browsers from MIME-sniffing a response away from the declared content-type
+	}),
+);
 
-app.use(cors({
-    origin: [env.FRONTEND_URL, env.APP_URL].filter(Boolean), // Allow requests from frontend and backend URLs defined in env
-    credentials: false, // Set to true if you have your frontend and backend are on different origins.
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS'], // Allowed HTTP methods
-    allowedHeaders: ['Content-Type'],
-}));
-
-
-
+app.use(
+	cors({
+		origin: [env.FRONTEND_URL, env.APP_URL].filter(Boolean), // Allow requests from frontend and backend URLs defined in env
+		credentials: false, // Set to true if you have your frontend and backend are on different origins.
+		methods: ["GET", "POST", "PUT", "PATCH", "OPTIONS"], // Allowed HTTP methods
+		allowedHeaders: ["Content-Type"],
+	}),
+);
 
 /**
  * REQUEST PARSING MIDDLEWARE
@@ -78,39 +71,27 @@ app.use(cors({
  * - app.set('trust proxy', 1): This tells Express to trust the first proxy in front of it (like a load balancer), which allows req.ip to correctly identify the client's IP address instead of the proxy's IP. This is important for accurate logging and rate limiting based on client IP.
  */
 
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 app.use(compression());
-app.set('trust proxy', 1); // Trust first proxy, enables req.ip to resolve correctly
-
-
-
+app.set("trust proxy", 1); // Trust first proxy, enables req.ip to resolve correctly
 
 /**
  * AUTHENTICATION HANDLER
  */
-app.use('/api/auth', toNodeHandler(auth));
-
-
-
+app.use("/api/auth", toNodeHandler(auth));
 
 /**
  * STATIC FILE SERVING
  * - express.static: Serves static files from the specified directory. In this case, it serves files from the 'public' directory, which can include CSS, JS, images, etc.
  */
-app.use(express.static(path.join(__dirname, '../public')));
-
-
-
+app.use(express.static(path.join(__dirname, "../public")));
 
 /**
  * SESSION MIDDLEWARE
  * - sessionMiddleware: Custom middleware that retrieves the user's session using Better-Auth and attaches the user and session information to res.locals for easy access in routes and views.
  */
 app.use(sessionMiddleware);
-
-
-
 
 /**
  * LOGGING & TRACKING MIDDLEWARE
@@ -121,26 +102,17 @@ app.use(sessionMiddleware);
 app.use(requestIdMiddleware);
 app.use(requestLoggerMiddleware);
 
-
-
-
 /**
  * RATE LIMITING MIDDLEWARE FOR ALL ROUTES
  */
 
 app.use(generalRateLimiterMiddleware);
 
-
-
-
 /**
  * API ROUTES
  */
 
-app.use('/', routes);
-
-
-
+app.use("/", routes);
 
 /**
  * ERROR HANDLING MIDDLEWARE
@@ -149,8 +121,5 @@ app.use('/', routes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
-
-
-
 
 export default app;
