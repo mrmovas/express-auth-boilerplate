@@ -1,6 +1,6 @@
 {
     "name": "express-betterauth-boilerplate",
-    "version": "1.1.1-beta",
+    "version": "1.1.2-beta",
     "description": "Production-ready Express & TypeScript boilerplate featuring Better-Auth, Prisma ORM, and PostgreSQL with a clean, type-safe architecture.",
     "main": "index.js",
     "scripts": {

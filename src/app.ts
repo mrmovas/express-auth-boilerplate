@@ -16,7 +16,7 @@ import { errorHandler } from '@/middleware/error.middleware';
 import { sessionMiddleware } from './middleware/session.middleware';
 
 //ROUTES
-import routes from '@/routes/index.routes';
+// import routes from '@/api/index.routes';
 
 
 
@@ -62,7 +62,7 @@ app.use(helmet({
 
 app.use(cors({
     origin: [env.FRONTEND_URL, env.APP_URL].filter(Boolean), // Allow requests from frontend and backend URLs defined in env
-    credentials: false, // Set to true if you have your frontend and backend are on different origins.
+    credentials: true, // Set to true if you have your frontend and backend are on different origins.
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS'], // Allowed HTTP methods
     allowedHeaders: ['Content-Type'],
 }));
@@ -90,15 +90,6 @@ app.set('trust proxy', 1); // Trust first proxy, enables req.ip to resolve corre
  * AUTHENTICATION HANDLER
  */
 app.use('/api/auth', toNodeHandler(auth));
-
-
-
-
-/**
- * STATIC FILE SERVING
- * - express.static: Serves static files from the specified directory. In this case, it serves files from the 'public' directory, which can include CSS, JS, images, etc.
- */
-app.use(express.static(path.join(__dirname, '../public')));
 
 
 
@@ -137,7 +128,7 @@ app.use(generalRateLimiterMiddleware);
  * API ROUTES
  */
 
-app.use('/', routes);
+// app.use('/api', routes);
 
 
 
