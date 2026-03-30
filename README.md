@@ -1,17 +1,20 @@
 # Express-BetterAuth-Boilerplate
 
-> Current version 1.1.2-beta - A boilerplate for handling authentication in Express.js using Better-Auth, Prisma with PostgreSQL and Typescript. Alpine.js
+> **Current version 1.1.2-beta** - A backend boilerplate for handling authentication in Express.js using Better-Auth, Prisma with PostgreSQL and Typescript.
+
+> ℹ️ **Info:**
+> At the moment, this project is still in development and is not yet ready for production use.
+> However, at the current state, it is ready to be used as a starting point if you know how to set up your pages and routes, and how to use the authentication middleware provided in this boilerplate.
+
+> ⚠️ **Note:**
+> This project, with simple words, is the backend; anything related to the frontend will be removed from the repo because I am working on a new repo [Nuxt-BetterAuth-Boilerplate](https://github.com/mrmovas/Nuxt-BetterAuth-Boilerplate), which will be a frontend template using this backend template.  
 
 This project is being created to learn and provide a template for me and others to quickly set up authentication in Express.js applications to avoid having to rewrite the same code for every project, to help focus on the unique features of the application and not have to worry about the authentication.
 
 This boilerplate is using [Better-Auth](https://better-auth.com/) for handling authentication, Prisma for database management and PostgreSQL as the database. It also uses TypeScript for type safety and a better development experience.
 Better-Auth is set up and ready. All routes and middleware for authentication are ready to use.
 
-Alpine.js is used for the frontend, but for anyone who wants to use a different frontend framework or library, it can be easily replaced or removed as needed.
-I am personally planning to learn React and Next.js, and I will perhaps replace Alpine.js with React in the future, but for now, I will keep it simple with Alpine.js as it is something I am already familiar so I can focus on the backend and authentication part of the project which is the main goal of this boilerplate.
-
-> At the moment, this project is still in development and is not yet ready for production use.
-> However, at the current state, it is ready to be used as a starting point if you know how to set up your pages and routes, and how to use the authentication middleware provided in this boilerplate.
+Alpine.js is currently used for the frontend, but anyone who prefers a different framework or library can easily replace or remove it as needed.
 
 ---
 
@@ -86,6 +89,30 @@ To start the development server, run the following command:
 ```bash
 npm run dev
 ```
+
+---
+
+## Roadmap
+The next updates for this boilerplate will include:
+
+### Frontend
+The HTML files will be removed and be replaced with a new logic supporting integration with another frontend framework, supporting both development and production environments.
+
+### Docker & Production Setup
+Plan to add Docker to containerize the applications and make them production-ready.
+
+### Logging
+Logging is still something I haven't fully figured out yet.
+I don't want to just dump logs into a file. I'm trying to understand how to handle this properly in a more professional way.
+
+### API Features / Example Implementations
+I want to create implementations to demonstrate API routes with features like users could create text posts, and an admin role could delete users, remove posts, or manage other features that I'll define later.
+
+### Cookies & Analytics
+I also plan to add a cookie consent pop-up, including support for statistics cookies (such as Google Analytics), allowing users to enable or disable them.
+
+### Documentation
+It's important to properly document how everything works. That way, both I and anyone else can understand the structure of the project, how it's built, and how to use it as a starting point for building our own ideas on top of it.
 
 ---
 
