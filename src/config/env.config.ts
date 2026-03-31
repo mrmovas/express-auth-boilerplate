@@ -9,17 +9,14 @@ const envSchema = z.object({
     // SERVER
     NODE_ENV: z.enum(['development', 'production']).default('development'),
     LOG_LEVEL: z.enum(['error', 'warn', 'info', 'http', 'debug']).default('info'),
-    PORT: z.string().default('3000'),
+    PORT: z.string().default('4000'),
 
     // DATABASE
     DATABASE_URL: z.string().nonempty('[ENV] Database URL is required'),
 
     // SESSION
-    SESSION_SECRET: z.string().min(32, '[ENV] Session secret must be at least 32 characters'),
-    SESSION_NAME: z.string().default('sid'),
-    SESSION_MAX_AGE: z.string().default((1000 * 60 * 60 * 24).toString()).transform(Number).pipe(z.number().positive()), // 1 day in ms
     BETTER_AUTH_SECRET: z.string().min(32, '[ENV] BetterAuth secret must be at least 32 characters'),
-    BETTER_AUTH_BASE_URL: z.url().default('http://localhost:3000'),
+    BETTER_AUTH_URL: z.url(),
     BETTER_AUTH_LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
 
     // SECURITY
@@ -36,7 +33,7 @@ const envSchema = z.object({
     EMAIL_SECURE: z.string().default('false').transform(val => val === 'true'),
 
     // APPLICATION
-    APP_URL: z.url().default('http://localhost:3000'),
+    APP_URL: z.url().default('http://localhost:4000'),
     FRONTEND_URL: z.url().default('http://localhost:3000'),
 
     // TOKENS
