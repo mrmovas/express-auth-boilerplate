@@ -4,9 +4,8 @@ import cors from 'cors';
 import compression from 'compression';
 import { toNodeHandler } from "better-auth/node";
 import { auth } from '@/utils/auth';
-import path from 'path';
 
-import { env, isProduction } from '@/config/env.config';
+import { env } from '@/config/env.config';
 
 //MIDDLEWARE
 import { requestIdMiddleware, requestLoggerMiddleware } from '@/middleware/requestLogger.middleware';
@@ -21,6 +20,16 @@ import { sessionMiddleware } from './middleware/session.middleware';
 
 
 const app: Application = express();
+
+
+
+
+/*
+ * This tells Express to trust the first proxy in front of it (like a load balancer),
+ * which allows req.ip to correctly identify the client's IP address instead of the proxy's IP.
+ * This is important for accurate logging and rate limiting based on client IP.
+*/
+app.set('trust proxy', 1);
 
 
 
@@ -45,8 +54,8 @@ app.use(helmet({
 app.use(cors({
     origin: [env.FRONTEND_URL, env.APP_URL].filter(Boolean), // Allow requests from frontend and backend URLs defined in env
     credentials: true, // Set to true if you have your frontend and backend are on different origins.
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS'], // Allowed HTTP methods
-    allowedHeaders: ['Content-Type'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 
@@ -57,13 +66,11 @@ app.use(cors({
  * - express.json(): Parses incoming requests with JSON payloads and is based on body-parser.
  * - express.urlencoded(): Parses incoming requests with URL-encoded payloads. Extended option allows for rich objects and arrays to be encoded into the URL-encoded format.
  * - compression: Compresses response bodies for all requests that traverse through the middleware, improving performance by reducing the size of the response body.
- * - app.set('trust proxy', 1): This tells Express to trust the first proxy in front of it (like a load balancer), which allows req.ip to correctly identify the client's IP address instead of the proxy's IP. This is important for accurate logging and rate limiting based on client IP.
  */
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(compression());
-app.set('trust proxy', 1); // Trust first proxy, enables req.ip to resolve correctly
 
 
 

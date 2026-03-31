@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger, reqCtx } from '@/utils/logger.util';
+import { sendUnauthorized, sendForbidden } from '@/utils/response.util';
 
-export const requireAuth = (_req: Request, res: Response, next: NextFunction): void => {
+export const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
     if(!res.locals.user) {
-        logger.warn('Unauthenticated access attempt', { ...reqCtx(_req) });
-        return res.redirect('/auth');
+        logger.warn('Unauthenticated access attempt', { ...reqCtx(req) });
+        sendUnauthorized(res);
+        return;
     }
 
     next();
@@ -12,22 +14,22 @@ export const requireAuth = (_req: Request, res: Response, next: NextFunction): v
 
 
 export const requireRole = (role: string | string[]) => {
-    return (_req: Request, res: Response, next: NextFunction) => {
+    return (req: Request, res: Response, next: NextFunction) => {
         if(!res.locals.user) {
-            logger.warn('Unauthenticated access attempt', { ...reqCtx(_req) });
-            return res.redirect('/auth');
+            logger.warn('Unauthenticated access attempt', { ...reqCtx(req) });
+            sendUnauthorized(res);
+            return;
         }
 
-        if(Array.isArray(role) && !role.includes(res.locals.user.role)) {
-            logger.warn('Unauthorized access attempt', { requiredRole: role, userRole: res.locals.user.role, ...reqCtx(_req) });
-            return res.status(403).send('Forbidden');
+        const userRole = res.locals.user.role;
+        const hasRole = Array.isArray(role) ? role.includes(userRole) : userRole === role;
+
+        if(!hasRole) {
+            logger.warn('Unauthorized access attempt', { requiredRole: role, userRole, ...reqCtx(req) });
+            sendForbidden(res);
+            return;
         }
 
-        else if(!Array.isArray(role) && res.locals.user.role !== role) {
-            logger.warn('Unauthorized access attempt', { requiredRole: role, userRole: res.locals.user.role, ...reqCtx(_req) });
-            return res.status(403).send('Forbidden');
-        }
-
-        return next();
+        next();
     }
 }

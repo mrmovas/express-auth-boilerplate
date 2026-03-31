@@ -16,6 +16,9 @@ export const auth = betterAuth({
     trustedOrigins: [env.FRONTEND_URL, env.APP_URL],
     secret: env.BETTER_AUTH_SECRET,
 
+    fetchOptions: {
+        credentials: 'include',
+    },
 
     advanced: {
 		ipAddress: {
@@ -107,7 +110,7 @@ export const auth = betterAuth({
 
     emailVerification: {
         sendVerificationEmail: async ({ user, url }) => {
-            sendVerificationEmail(user.email, url);
+            await sendVerificationEmail(user.email, url);
         },
         sendOnSignUp: true,
         expiresIn: env.VERIFICATION_TOKEN_EXPIRE_IN, // 3600 seconds = 1 hour (by default)
