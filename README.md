@@ -67,14 +67,6 @@ npm run db:migrate # This maps your schema.prisma to the actual database tables.
 npm run db:generate # This generates the Prisma client based on your schema.prisma file.
 ```
 
-## Tailwind CSS Setup
-
-To build the Tailwind CSS styles, run the following command:
-
-```bash
-npm run tailwind:build
-```
-
 ## Type Checking
 To check for type errors in the project, you can run the following command:
 
