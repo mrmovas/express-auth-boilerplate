@@ -5,11 +5,17 @@ import { Request } from 'express';
 import { env } from '@/config/env.config';
 
 
+// Returns a timestamp string in the local system timezone
+const localTimestamp = () =>
+    new Date().toLocaleString('sv-SE', { 
+        timeZone: 'Europe/Athens',
+        hour12: false 
+    }).replace('T', ' ');
 
 
 // CUSTOM LOG FORMAT
 const customFormat = winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    winston.format.timestamp({ format: localTimestamp }),
     winston.format.errors({ stack: true }),
     winston.format.splat(),
     winston.format.json()
@@ -21,7 +27,7 @@ const customFormat = winston.format.combine(
 // CONSOLE FORMAT FOR DEVELOPMENT
 const consoleFormat = winston.format.combine(
     winston.format.colorize(),
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    winston.format.timestamp({ format: localTimestamp }),
     winston.format.printf(({ timestamp, level, message, ...meta }) => {
         let msg = `${timestamp} [${level}]: ${message}`;
         if(Object.keys(meta).length > 0) msg += `\t${JSON.stringify(meta)}`;
