@@ -7,14 +7,10 @@ COPY package*.json ./
 RUN npm ci
 
 COPY tsconfig.json ./
-COPY prisma/ ./prisma/
-
-# Generate Prisma client into src/generated/prisma
-RUN npm run db:generate
 
 COPY src/ ./src/
 
-# Compile TypeScript to dist/ and copy generated Prisma client
+# Compile TypeScript to dist/
 RUN npm run build
 
 
@@ -34,11 +30,6 @@ RUN npm ci --omit=dev
 
 # Copy compiled app from builder
 COPY --from=builder /app/dist ./dist
-COPY prisma/ ./prisma/
-
-# Copy entrypoint script
-COPY entrypoint.sh ./entrypoint.sh
-RUN chmod +x entrypoint.sh
 
 # Run as non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup \
@@ -48,4 +39,4 @@ USER appuser
 EXPOSE 3000
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["sh", "entrypoint.sh"]
+CMD ["node", "dist/index.js"]
