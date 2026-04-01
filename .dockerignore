@@ -1,0 +1,8 @@
+node_modules
+dist
+.env
+logs
+*.log
+.git
+.gitignore
+prisma/migrations
