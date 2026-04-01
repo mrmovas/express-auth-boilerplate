@@ -1,6 +1,6 @@
 # Express-BetterAuth-Boilerplate
 
-> **Current version 1.2.0-beta** - A backend boilerplate for handling authentication in Express.js using Better-Auth, Kysely with PostgreSQL and Typescript.
+> **Current version 1.3.0** - A backend boilerplate for handling authentication in Express.js using Better-Auth, Kysely with PostgreSQL and Typescript.
 
 > ℹ️ **Info:**
 > At the moment, this project is still in development and is not yet ready for production use.
@@ -82,21 +82,12 @@ npm run dev
 ## Roadmap
 The next updates for this boilerplate will include:
 
-### Frontend
-The HTML files will be removed and be replaced with a new logic supporting integration with another frontend framework, supporting both development and production environments.
-
-### Docker & Production Setup
-Plan to add Docker to containerize the applications and make them production-ready.
-
 ### Logging
 Logging is still something I haven't fully figured out yet.
 I don't want to just dump logs into a file. I'm trying to understand how to handle this properly in a more professional way.
 
 ### API Features / Example Implementations
 I want to create implementations to demonstrate API routes with features like users could create text posts, and an admin role could delete users, remove posts, or manage other features that I'll define later.
-
-### Cookies & Analytics
-I also plan to add a cookie consent pop-up, including support for statistics cookies (such as Google Analytics), allowing users to enable or disable them.
 
 ### Documentation
 It's important to properly document how everything works. That way, both I and anyone else can understand the structure of the project, how it's built, and how to use it as a starting point for building our own ideas on top of it.
@@ -112,7 +103,7 @@ To create a pull request, follow these steps:
 - Make your changes and commit them with clear and descriptive messages.
 - Push your changes and open a pull request against the `main` branch of this repository.
 
-Please keep changes focused, large pulled requests may be harder to review and merge. 
+Please keep changes focused, large pull requests may be harder to review and merge. 
 
 ---
 
