@@ -61,8 +61,33 @@ To check for type errors in the project, you can run the following command:
 npm run typecheck
 ```
 
-## Development Launch
-To start the development server, run the following command:
+## Running with Docker
+
+### Development
+Starts the app with hot reload, PostgreSQL, and [Mailpit](http://localhost:8025) for email testing.
+
+```bash
+docker compose -f docker-compose.dev.yml up
+```
+
+- App: `http://localhost:4000`
+- Mailpit UI: `http://localhost:8025`
+- SMTP: `localhost:1025`
+
+Code changes are reflected immediately without restarting the container.
+
+### Production
+Builds and runs the optimised production image.
+
+```bash
+docker network create app-net  # only needed once
+docker compose -f docker-compose.prod.yml up --build
+```
+
+---
+
+## Development Launch (without Docker)
+To start the development server locally, run the following command:
 
 ```bash
 npm run dev
