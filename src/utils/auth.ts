@@ -75,25 +75,21 @@ export const auth = betterAuth({
             firstName: {
                 type: "string",
                 required: true,
-                defaultValue: '',
                 input: true, // This field will be included in the registration form
             },
             lastName: {
                 type: "string",
                 required: true,
-                defaultValue: '',
                 input: true, // This field will be included in the registration form
             },
             country: {
                 type: "string",
                 required: true,
-                defaultValue: '',
                 input: true, // This field will be included in the registration form
             },
             phoneNumber: {
                 type: "string",
                 required: true,
-                defaultValue: '',
                 input: true, // This field will be included in the registration form
             },
             role: {
