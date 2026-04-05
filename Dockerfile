@@ -1,3 +1,16 @@
+# Stage 0: Development
+FROM node:24-alpine AS development
+
+WORKDIR /app
+
+COPY package*.json tsconfig.json ./
+RUN npm install
+
+CMD ["npm", "run", "dev"]
+
+
+
+
 # Stage 1: Build
 FROM node:24-alpine AS builder
 
