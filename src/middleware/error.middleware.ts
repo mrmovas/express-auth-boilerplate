@@ -19,6 +19,6 @@ export const errorHandler = (err: Error, req: Request, res: Response, _next: Nex
     res.status(status).json({
         error: err.name || 'Internal Server Error',
         message: err.message || 'An unexpected error occurred',
-        ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+        ...(process.env.NODE_ENV === 'development' && { stack: err.stack }), // Include stack trace in development for easier debugging
     });
 };
