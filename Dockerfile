@@ -49,7 +49,7 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup \
     && chown -R appuser:appgroup /app
 USER appuser
 
-EXPOSE 3000
+EXPOSE 4000
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "dist/index.js"]
