@@ -8,7 +8,7 @@ config({ quiet: true });
 const envSchema = z.object({
     // SERVER
     NODE_ENV: z.enum(['development', 'production']).default('development'),
-    LOG_LEVEL: z.enum(['error', 'warn', 'info', 'http', 'debug']).default('info'),
+    LOG_LEVEL: z.enum(['error', 'warn', 'info', 'http', 'debug']).default('warn'),
     PORT: z.string().default('4000'),
 
     // DATABASE
@@ -17,12 +17,7 @@ const envSchema = z.object({
     // SESSION
     BETTER_AUTH_SECRET: z.string().min(32, '[ENV] BetterAuth secret must be at least 32 characters'),
     BETTER_AUTH_URL: z.url(),
-    BETTER_AUTH_LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
-
-    // SECURITY
-    BCRYPT_ROUNDS: z.string().default('12').transform(Number).pipe(z.number().min(10).max(15)),
-    RATE_LIMIT_WINDOW_MS: z.string().default('900000').transform(Number).pipe(z.number().positive()), // 15 min
-    RATE_LIMIT_MAX_REQUESTS: z.string().default('100').transform(Number).pipe(z.number().positive()),
+    BETTER_AUTH_LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('warn'),
 
     // EMAIL
     EMAIL_HOST: z.string(),
@@ -37,8 +32,8 @@ const envSchema = z.object({
     FRONTEND_URL: z.url().default('http://localhost:3000'),
 
     // TOKENS
-    VERIFICATION_TOKEN_EXPIRE_IN: z.string().default('24').transform(Number).pipe(z.number().positive()),
-    PASSWORD_RESET_TOKEN_EXPIRE_IN: z.string().default('1').transform(Number).pipe(z.number().positive()),
+    VERIFICATION_TOKEN_EXPIRE_IN: z.string().default('3600').transform(Number).pipe(z.number().positive()),
+    PASSWORD_RESET_TOKEN_EXPIRE_IN: z.string().default('3600').transform(Number).pipe(z.number().positive()),
 });
 
 
