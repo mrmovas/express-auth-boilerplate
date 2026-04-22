@@ -48,7 +48,16 @@ export const isTest = process.env.NODE_ENV === 'test';
 // VALIDATING ENVIRONMENT VARIABLES
 const parsedEnv = envSchema.safeParse(process.env);
 if (!parsedEnv.success) {
-    console.error('❌ Invalid environment variables:', parsedEnv.error.format());
+    const { fieldErrors } = parsedEnv.error.flatten((issue) => issue.message);
+    const errorLines = Object.entries(fieldErrors)
+        .map(([key, errors]) => `  ${key}: ${errors?.join(', ')}`)
+        .join('\n');
+
+    console.error(
+        "\n❌ Invalid environment variables:\n\n",
+        `${errorLines}\n\n`,
+        "Fix the above variables in your .env file and restart."
+    );
     process.exit(1);
 }
 
