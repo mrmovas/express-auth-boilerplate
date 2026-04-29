@@ -153,17 +153,6 @@ The PostgreSQL connection is managed through a shared `pg.Pool` instance ([src/c
 
 Queries exceeding 500 ms are logged at `warn` level with the SQL text, duration, and request context (requestId, userId, ip).
 
-### Schema Management
-
-On startup, `setupDatabase()` ([src/bootstrap/database-setup.ts](../src/bootstrap/database-setup.ts)):
-
-1. Runs Better-Auth's programmatic migrations (`getMigrations`) to create/update its tables (user, session, verification, account, rate limit).
-2. Runs custom table checks via Kysely for application-specific tables.
-
-> ⚠️⚠️⚠️ <br/>
-> For schema changes to application tables, write migration scripts manually and update the `Database` interface in [src/types/database.types.ts](../src/types/database.types.ts) to keep Kysely's type safety current.  <br/>
-> Always remember to back up your database before running new migrations in production!
-
 ---
 
 ## Logging
