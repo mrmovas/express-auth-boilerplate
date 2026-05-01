@@ -2,8 +2,7 @@ node_modules/
 dist/
 build/
 logs/*
-/src/generated/prisma
 
 .env
 package-lock.json
-public/styles.css
+src/types/database.types.ts
